@@ -94,8 +94,8 @@ This bundle mounts exactly that server: same binary, same `--app desktop`, same 
 - forwards `PEN_MCP_CONVERSATION_ID` as `--conversation_id`
 - raises the per-call timeout to 120 s, because `execute` and `browser` can exceed the 60 s default
 
-`--enable_spawn_agents` is deliberately not passed: it would let pen.dev start its own agents outside
-DeepSeek Harness.
+`--enable_spawn_agents` is off by default: it would let pen.dev start its own agents outside DeepSeek
+Harness. Set `PEN_MCP_ENABLE_SPAWN_AGENTS=1` to enable it deliberately.
 
 The `@pencil.dev/cli` npm package ships a *different* MCP server build — nine `filePath`-based tools
 for its headless `.pen` editor. It is not a drop-in replacement for this integration: against the
@@ -110,6 +110,7 @@ desktop app that server's IPC methods are not implemented (`No handler found for
 | `PEN_APP_PATH` | auto-detected | Absolute path to the pen.dev app bundle, when detection misses it. |
 | `PEN_MCP_AGENT` | `deepseekHarness` | `--agent` value the pen.dev app sees for this connection. |
 | `PEN_MCP_CONVERSATION_ID` | — | Forwarded as `--conversation_id`. |
+| `PEN_MCP_ENABLE_SPAWN_AGENTS` | off | `1` or `true` passes `--enable_spawn_agents` (adds a `spawn_agents` tool). |
 | `PEN_MCP_SERVER_NAME` | `pen` | MCP namespace, i.e. the `mcp__<name>__*` prefix. |
 
 The binary path is computed when the profile activates. The patch probes the usual install roots with

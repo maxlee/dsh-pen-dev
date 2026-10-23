@@ -87,7 +87,8 @@ pen.dev 官方的桌面接入配置是：
 - 支持 `PEN_MCP_CONVERSATION_ID`，映射为 `--conversation_id`
 - 把单次调用超时提到 120s，`execute` 和 `browser` 的较大操作常常超过默认 60s
 
-**不**默认传 `--enable_spawn_agents`：那会让 pen.dev 在 DSH 之外再拉起它自己的 agent。
+**不**默认传 `--enable_spawn_agents`：那会让 pen.dev 在 DSH 之外再拉起它自己的 agent。确实需要时
+设 `PEN_MCP_ENABLE_SPAWN_AGENTS=1`。
 
 另外，`@pencil.dev/cli` npm 包里带的是**另一套** MCP server（9 个以 `filePath` 为参数的工具，
 服务于它的无头 `.pen` 编辑器）。它不能替代本插件：连到桌面 app 时它调的 IPC 方法并不存在
@@ -101,6 +102,7 @@ pen.dev 官方的桌面接入配置是：
 | `PEN_APP_PATH` | 自动探测 | pen.dev 应用目录的绝对路径，自动探测不到时用。 |
 | `PEN_MCP_AGENT` | `deepseekHarness` | 传给 `--agent` 的值，pen.dev 用它区分连接来源。 |
 | `PEN_MCP_CONVERSATION_ID` | — | 映射为 `--conversation_id`。 |
+| `PEN_MCP_ENABLE_SPAWN_AGENTS` | 关 | 设为 `1` 或 `true` 时传 `--enable_spawn_agents`（多出 `spawn_agents` 工具）。 |
 | `PEN_MCP_SERVER_NAME` | `pen` | MCP 命名空间，即 `mcp__<name>__*` 前缀。 |
 
 二进制路径在 profile 激活时计算：patch 用 `node:fs` 探测常见安装根目录，只有装在非常规位置才需要

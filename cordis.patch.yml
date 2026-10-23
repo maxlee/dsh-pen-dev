@@ -58,6 +58,7 @@
             var env = process.env;
             var args = ['--app', 'desktop', '--agent', env.PEN_MCP_AGENT || 'deepseekHarness'];
             if (env.PEN_MCP_CONVERSATION_ID) args.push('--conversation_id', env.PEN_MCP_CONVERSATION_ID);
+            if (env.PEN_MCP_ENABLE_SPAWN_AGENTS === '1' || env.PEN_MCP_ENABLE_SPAWN_AGENTS === 'true') args.push('--enable_spawn_agents');
             return args;
           })()
         toolCallTimeoutMs: 120000
