@@ -1,9 +1,11 @@
 # dsh-pen-dev — unofficial pen.dev MCP integration for DeepSeek Harness.
 #
 # pen-dev-mcp    mounts @deepseek-ai/dsh-mcp-client against the pen.dev desktop app.
-#                The binary lives inside the app bundle; its path is computed at
-#                activation time because YAML cannot stat the filesystem.
-# pen-dev-skill  registers the `pen-dev` skill (fallback docs + canvas workflow).
+#                The official config is exactly `mcp-server-<platform>-<arch>
+#                --app desktop`; this row adds `--agent` attribution and locates the
+#                binary by probing the filesystem at activation time.
+# pen-dev-skill  registers the `pen-dev` skill (canvas workflow + pointers to
+#                pen.dev's own `read_skill` docs).
 #
 # Remove any hand-written `mcp-client` row for pen.dev before enabling this
 # bundle: two mcp-client instances cannot share one `serverName`.
@@ -15,13 +17,50 @@
         serverName: !!js "process.env.PEN_MCP_SERVER_NAME || 'pen'"
         transport: stdio
         command: !!js >-
-          process.env.PEN_MCP_BIN ||
-          ((process.env.PEN_APP_PATH || '/Applications/Pen.app').replace(/\/$/, '') +
-           '/Contents/Resources/app.asar.unpacked/out/mcp-server-' +
-           process.platform + '-' + (process.arch === 'arm64' ? 'arm64' : 'x64'))
-        args:
-          - "--app"
-          - "desktop"
+          (function () {
+            var win = process.platform === 'win32';
+            var exe = win ? '.exe' : '';
+            var file = 'mcp-server-' + process.platform + '-' + (process.arch === 'arm64' ? 'arm64' : 'x64') + exe;
+            var env = process.env;
+            if (env.PEN_MCP_BIN) return env.PEN_MCP_BIN;
+            var inner = process.platform === 'darwin'
+              ? ['Contents', 'Resources', 'app.asar.unpacked', 'out', file]
+              : ['resources', 'app.asar.unpacked', 'out', file];
+            var fallback = process.platform === 'darwin'
+              ? '/Applications/Pen.app'
+              : win
+                ? (env.LOCALAPPDATA ? env.LOCALAPPDATA + '/Programs/Pen' : 'C:/Program Files/Pen')
+                : '/opt/Pen';
+            var get = process.getBuiltinModule;
+            if (!get) return [fallback].concat(inner).join('/');
+            var fs = get('node:fs');
+            var path = get('node:path');
+            var os = get('node:os');
+            var apps = env.PEN_APP_PATH ? [env.PEN_APP_PATH] : [];
+            var roots = win
+              ? [env.LOCALAPPDATA ? path.join(env.LOCALAPPDATA, 'Programs') : '', env.ProgramFiles || '']
+              : ['/Applications', path.join(os.homedir(), 'Applications'), '/opt'];
+            roots.filter(Boolean).forEach(function (root) {
+              try {
+                fs.readdirSync(root).forEach(function (name) {
+                  if (/^Pen/i.test(name)) apps.push(path.join(root, name));
+                });
+              } catch (e) {}
+            });
+            for (var i = 0; i < apps.length; i++) {
+              var candidate = path.join.apply(null, [apps[i]].concat(inner));
+              if (fs.existsSync(candidate)) return candidate;
+            }
+            return path.join.apply(null, [fallback].concat(inner));
+          })()
+        args: !!js >-
+          (function () {
+            var env = process.env;
+            var args = ['--app', 'desktop', '--agent', env.PEN_MCP_AGENT || 'deepseekHarness'];
+            if (env.PEN_MCP_CONVERSATION_ID) args.push('--conversation_id', env.PEN_MCP_CONVERSATION_ID);
+            return args;
+          })()
+        toolCallTimeoutMs: 120000
         env: {}
 
     - id: pen-dev-skill

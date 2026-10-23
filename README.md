@@ -76,18 +76,45 @@ are:
 mcp-client instances cannot share one `serverName`; the second one fails with
 `serverName "pen" is already in use`.
 
+## How this relates to the official pen.dev MCP config
+
+pen.dev documents the desktop integration as:
+
+```json
+{"name":"pencil","transport":"stdio","command":"…/mcp-server-<platform>-<arch>","args":["--app","desktop"],"env":{}}
+```
+
+This bundle mounts exactly that server: same binary, same `--app desktop`, same five tools
+(`browser`, `execute`, `get_app_state`, `get_style`, `read_skill`). On top of the minimal config it:
+
+- locates the binary by probing `/Applications`, `~/Applications`, `/opt`, and (on Windows)
+  `%LOCALAPPDATA%\Programs`, so a non-standard install works without editing config files
+- passes `--agent deepseekHarness` so the pen.dev app can tell this connection apart from Claude Code
+  or Codex; override it with `PEN_MCP_AGENT`
+- forwards `PEN_MCP_CONVERSATION_ID` as `--conversation_id`
+- raises the per-call timeout to 120 s, because `execute` and `browser` can exceed the 60 s default
+
+`--enable_spawn_agents` is deliberately not passed: it would let pen.dev start its own agents outside
+DeepSeek Harness.
+
+The `@pencil.dev/cli` npm package ships a *different* MCP server build — nine `filePath`-based tools
+for its headless `.pen` editor. It is not a drop-in replacement for this integration: against the
+desktop app that server's IPC methods are not implemented (`No handler found for method
+'get-editor-state'`).
+
 ## Configuration
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
 | `PEN_MCP_BIN` | — | Absolute path to the pen.dev MCP server binary. Use it for a non-standard install or another platform. |
-| `PEN_APP_PATH` | `/Applications/Pen.app` | Absolute path to the pen.dev app bundle. |
+| `PEN_APP_PATH` | auto-detected | Absolute path to the pen.dev app bundle, when detection misses it. |
+| `PEN_MCP_AGENT` | `deepseekHarness` | `--agent` value the pen.dev app sees for this connection. |
+| `PEN_MCP_CONVERSATION_ID` | — | Forwarded as `--conversation_id`. |
 | `PEN_MCP_SERVER_NAME` | `pen` | MCP namespace, i.e. the `mcp__<name>__*` prefix. |
 
-The binary path is computed when the profile activates (YAML cannot inspect the filesystem): the
-patch derives `Contents/Resources/app.asar.unpacked/out/mcp-server-<platform>-<arch>` from
-`PEN_APP_PATH`, so `PEN_APP_PATH` is the knob for a non-standard install location. If the path does
-not exist, mcp-client reports the spawn failure, adds no tools, and the rest of the harness keeps
+The binary path is computed when the profile activates. The patch probes the usual install roots with
+`node:fs`, so `PEN_APP_PATH` is only needed when the app lives somewhere unusual. If nothing is
+found, mcp-client reports the spawn failure, adds no tools, and the rest of the harness keeps
 working.
 
 ## Notes and caveats
@@ -101,7 +128,8 @@ working.
 - `PEN_MCP_BIN` requires the enclosing app (or a launcher that sets the variable) to pass it
   through. On macOS, GUI apps do not inherit your shell environment; `PEN_APP_PATH` exists mainly
   for launchers that do.
-- Windows/Linux: only `PEN_MCP_BIN` is supported today. The platform paths are untested.
+- Windows/Linux: the path probe understands the usual Electron layouts, but only macOS is tested;
+  `PEN_MCP_BIN` always wins when set.
 
 ## Uninstall
 

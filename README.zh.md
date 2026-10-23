@@ -70,18 +70,41 @@ patch 会插入下面两行：
 **如果你之前手写过 pen.dev 配置**，请先删掉那条手写的 `mcp-client` 行。两个 mcp-client 实例
 不能共用同一个 `serverName`，后加载的那个会报 `serverName "pen" is already in use`。
 
+## 与官方 MCP 配置的关系
+
+pen.dev 官方的桌面接入配置是：
+
+```json
+{"name":"pencil","transport":"stdio","command":"…/mcp-server-<platform>-<arch>","args":["--app","desktop"],"env":{}}
+```
+
+本插件挂载的就是这个 server：同一个二进制、同样的 `--app desktop`、同样 5 个工具
+（`browser`、`execute`、`get_app_state`、`get_style`、`read_skill`）。相比最小配置，它额外做了：
+
+- 用 `node:fs` 在 `/Applications`、`~/Applications`、`/opt` 和 Windows 的 `%LOCALAPPDATA%\Programs`
+  里探测二进制，非标准安装位置不用改配置
+- 传 `--agent deepseekHarness`，让 pen.dev 区分这是 DSH 的连接（`PEN_MCP_AGENT` 可覆盖）
+- 支持 `PEN_MCP_CONVERSATION_ID`，映射为 `--conversation_id`
+- 把单次调用超时提到 120s，`execute` 和 `browser` 的较大操作常常超过默认 60s
+
+**不**默认传 `--enable_spawn_agents`：那会让 pen.dev 在 DSH 之外再拉起它自己的 agent。
+
+另外，`@pencil.dev/cli` npm 包里带的是**另一套** MCP server（9 个以 `filePath` 为参数的工具，
+服务于它的无头 `.pen` 编辑器）。它不能替代本插件：连到桌面 app 时它调的 IPC 方法并不存在
+（实测报 `No handler found for method 'get-editor-state'`）。
+
 ## 配置
 
 | 环境变量 | 默认值 | 含义 |
 | --- | --- | --- |
 | `PEN_MCP_BIN` | — | pen.dev MCP server 二进制的绝对路径，用于非标准安装位置或其他平台。 |
-| `PEN_APP_PATH` | `/Applications/Pen.app` | pen.dev 应用目录的绝对路径。 |
+| `PEN_APP_PATH` | 自动探测 | pen.dev 应用目录的绝对路径，自动探测不到时用。 |
+| `PEN_MCP_AGENT` | `deepseekHarness` | 传给 `--agent` 的值，pen.dev 用它区分连接来源。 |
+| `PEN_MCP_CONVERSATION_ID` | — | 映射为 `--conversation_id`。 |
 | `PEN_MCP_SERVER_NAME` | `pen` | MCP 命名空间，即 `mcp__<name>__*` 前缀。 |
 
-二进制路径在 profile 激活时计算（YAML 无法读取文件系统）：patch 由 `PEN_APP_PATH` 推出
-`Contents/Resources/app.asar.unpacked/out/mcp-server-<platform>-<arch>`，所以非标准安装位置改
-`PEN_APP_PATH` 即可。路径不存在时，mcp-client 会报 spawn 失败、不挂任何工具，harness 其余部分
-照常运行。
+二进制路径在 profile 激活时计算：patch 用 `node:fs` 探测常见安装根目录，只有装在非常规位置才需要
+`PEN_APP_PATH`。全部找不到时，mcp-client 会报 spawn 失败、不挂任何工具，harness 其余部分照常运行。
 
 ## 注意事项
 
@@ -90,7 +113,7 @@ patch 会插入下面两行：
 - 一张画布同一时间只让一个 agent 写：如果 Claude Code 也连着 Pen，不要让两边同时改。
 - `PEN_MCP_BIN` 需要由启动应用的外层把变量传进去。macOS 的 GUI 应用不继承 shell 环境，
   `PEN_APP_PATH` 主要服务于会传环境的启动器。
-- Windows / Linux：目前只支持 `PEN_MCP_BIN`，平台路径未经验证。
+- Windows / Linux：路径探测按常见 Electron 布局写了，但只在 macOS 上验证过；`PEN_MCP_BIN` 始终优先。
 
 ## 卸载
 

@@ -1,6 +1,6 @@
 {
   "name": "dsh-pen-dev",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Unofficial pen.dev MCP integration for DeepSeek Harness: design on the pen.dev canvas from a DSH session.",
   "type": "module",
   "main": "lib/skill.js",
