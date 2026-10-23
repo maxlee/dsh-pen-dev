@@ -1,0 +1,80 @@
+{
+  "format": 1,
+  "title": {
+    "en": "dsh-pen-dev",
+    "zh": "dsh-pen-dev"
+  },
+  "description": {
+    "en": "Unofficial pen.dev integration for DeepSeek Harness.",
+    "zh": "DeepSeek Harness 的非官方 pen.dev 接入。"
+  },
+  "metadata": {
+    "categories": {
+      "design": {
+        "title": {
+          "en": "Design",
+          "zh": "设计"
+        }
+      }
+    },
+    "labels": {
+      "mcp": {
+        "title": {
+          "en": "MCP",
+          "zh": "MCP"
+        }
+      },
+      "desktop-app": {
+        "title": {
+          "en": "Desktop app",
+          "zh": "桌面应用"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-pen-dev",
+      "title": {
+        "en": "pen.dev canvas",
+        "zh": "pen.dev 画布"
+      },
+      "description": {
+        "en": "Design on the pen.dev infinite canvas: frames, components, web-page reproduction, and style archetypes, through pen.dev's own MCP server.",
+        "zh": "在 pen.dev 无限画布上设计：frame、组件、网页复刻与风格原型，走 pen.dev 自带的 MCP server。"
+      },
+      "author": "max",
+      "homepage": "https://github.com/maxlee/dsh-pen-dev",
+      "repository": {
+        "url": "https://github.com/maxlee/dsh-pen-dev"
+      },
+      "metadata": {
+        "category": "design",
+        "labels": ["mcp", "desktop-app"],
+        "keywords": [
+          "pen.dev",
+          "canvas",
+          "design",
+          "mcp",
+          "frames",
+          "components",
+          "prototyping",
+          "画布",
+          "设计"
+        ]
+      },
+      "versions": [
+        {
+          "version": "0.1.0",
+          "publishTimestamp": 1792754913,
+          "source": {
+            "type": "npm"
+          },
+          "engines": {
+            "dsh": ">=0.2.1-rc.2"
+          }
+        }
+      ]
+    }
+  ]
+}

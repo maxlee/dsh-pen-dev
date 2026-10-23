@@ -1,0 +1,44 @@
+{
+  "name": "dsh-pen-dev",
+  "version": "0.1.0",
+  "description": "Unofficial pen.dev MCP integration for DeepSeek Harness: design on the pen.dev canvas from a DSH session.",
+  "type": "module",
+  "main": "lib/skill.js",
+  "exports": {
+    ".": "./lib/skill.js",
+    "./skill": "./lib/skill.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "assets",
+    "market",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh.md",
+    "PUBLISHING.md",
+    "PUBLISHING.zh.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "mcp",
+    "pen.dev",
+    "canvas",
+    "design"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxlee/dsh-pen-dev.git"
+  },
+  "dsh": {
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

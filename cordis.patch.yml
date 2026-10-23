@@ -1,0 +1,28 @@
+# dsh-pen-dev — unofficial pen.dev MCP integration for DeepSeek Harness.
+#
+# pen-dev-mcp    mounts @deepseek-ai/dsh-mcp-client against the pen.dev desktop app.
+#                The binary lives inside the app bundle; its path is computed at
+#                activation time because YAML cannot stat the filesystem.
+# pen-dev-skill  registers the `pen-dev` skill (fallback docs + canvas workflow).
+#
+# Remove any hand-written `mcp-client` row for pen.dev before enabling this
+# bundle: two mcp-client instances cannot share one `serverName`.
+
+- insert:
+    - id: pen-dev-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: !!js "process.env.PEN_MCP_SERVER_NAME || 'pen'"
+        transport: stdio
+        command: !!js >-
+          process.env.PEN_MCP_BIN ||
+          ((process.env.PEN_APP_PATH || '/Applications/Pen.app').replace(/\/$/, '') +
+           '/Contents/Resources/app.asar.unpacked/out/mcp-server-' +
+           process.platform + '-' + (process.arch === 'arm64' ? 'arm64' : 'x64'))
+        args:
+          - "--app"
+          - "desktop"
+        env: {}
+
+    - id: pen-dev-skill
+      name: dsh-pen-dev/skill
