@@ -35,6 +35,10 @@
     "type": "git",
     "url": "git+https://github.com/maxlee/dsh-pen-dev.git"
   },
+  "homepage": "https://github.com/maxlee/dsh-pen-dev#readme",
+  "bugs": {
+    "url": "https://github.com/maxlee/dsh-pen-dev/issues"
+  },
   "dsh": {
     "manifestVersion": 1,
     "bundle": {
