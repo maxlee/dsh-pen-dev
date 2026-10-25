@@ -77,3 +77,16 @@ server binary was not found; tell the user to check the `dsh-pen-dev` warning in
 
 If `execute` reports a canvas/IPC error, confirm `filePath` matches the active document from
 `get_app_state` — a stale path from a previously closed document is the common cause.
+
+## If the plan limit is hit
+
+pen.dev meters MCP usage as **active days** per billing period. When the allowance is used up the
+`pen-dev-quota-guard` turns the upstream failure into a short bilingual notice; treat it as a hard
+stop for design work:
+
+- Do not retry, and do not switch to editing `.pen` files with filesystem tools — that corrupts the
+  document and violates the plan.
+- Tell the user the limit is per billing period, that read tools also count as an active day, and
+  point them at the upgrade link from the notice (free plans cap active days; Pro removes the cap).
+- If the user upgrades, restart from `get_app_state` and confirm the document before resuming.
+

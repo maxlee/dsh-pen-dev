@@ -117,6 +117,16 @@ pen.dev 官方的桌面接入配置是：
   `PEN_APP_PATH` 主要服务于会传环境的启动器。
 - Windows / Linux：路径探测按常见 Electron 布局写了，但只在 macOS 上验证过；`PEN_MCP_BIN` 始终优先。
 
+## 计划额度
+
+pen.dev 把 MCP 用量记为**活跃天数**：本地时区下每个不同的日历天，只要调过任意 pen 工具就计 1 天，
+计入当前计费周期的额度。免费计划每月有若干天上限；Pro 计划取消该上限（"Design with agents every
+day"）。CLI 走同一套计量。
+
+额度用尽期间所有 pen 工具都会失败（读工具也一样）。插件里的 `pen-dev-quota-guard` 会把上游那段
+"STOP … do not work around this" 改写成简短双语提示并附上升级链接，让模型停下来而不是反复重试。
+本地没有可重置的计数：判定在 pen.dev 服务端，按组织计。
+
 ## 卸载
 
 把该组合包从 profile 移除（插件面板，或 `dsh plugin --profile <profile> remove dsh-pen-dev`）。

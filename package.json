@@ -1,12 +1,13 @@
 {
   "name": "dsh-pen-dev",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Unofficial pen.dev MCP integration for DeepSeek Harness: design on the pen.dev canvas from a DSH session.",
   "type": "module",
   "main": "lib/skill.js",
   "exports": {
     ".": "./lib/skill.js",
     "./skill": "./lib/skill.js",
+    "./quota-guard": "./lib/quota-guard.js",
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json"
   },

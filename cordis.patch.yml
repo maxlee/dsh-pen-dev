@@ -6,6 +6,9 @@
 #                binary by probing the filesystem at activation time.
 # pen-dev-skill  registers the `pen-dev` skill (canvas workflow + pointers to
 #                pen.dev's own `read_skill` docs).
+# pen-dev-quota  rewrites pen.dev's "usage limit reached" failures into a short
+#                bilingual notice with the upgrade link, instead of the upstream
+#                STOP instruction.
 #
 # Remove any hand-written `mcp-client` row for pen.dev before enabling this
 # bundle: two mcp-client instances cannot share one `serverName`.
@@ -66,3 +69,6 @@
 
     - id: pen-dev-skill
       name: dsh-pen-dev/skill
+
+    - id: pen-dev-quota-guard
+      name: dsh-pen-dev/quota-guard

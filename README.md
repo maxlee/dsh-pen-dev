@@ -132,6 +132,18 @@ working.
 - Windows/Linux: the path probe understands the usual Electron layouts, but only macOS is tested;
   `PEN_MCP_BIN` always wins when set.
 
+## Plan limits
+
+pen.dev meters MCP usage as **active days**: each distinct calendar day (in your timezone) on which
+any pen tool is called counts once toward the plan's allowance for the current billing period. Free
+plans cap this at a few days per month; the Pro plan removes the cap ("Design with agents every
+day"). The CLI is metered by the same system.
+
+While the allowance is exhausted, every pen tool fails — including reads. The bundled
+`pen-dev-quota-guard` rewrites the upstream "STOP … do not work around this" text into a short
+bilingual notice with the upgrade link, so the model stops instead of retrying. There is no local
+counter to reset: the check happens on pen.dev's servers, per organization.
+
 ## Uninstall
 
 Remove the bundle from the profile (Plugins UI, or `dsh plugin --profile <profile> remove dsh-pen-dev`).
